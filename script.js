@@ -12,13 +12,11 @@ function checkAuth() {
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
-        // Проверяем, существует ли пользователь в актуальном списке
         const actualUsers = JSON.parse(localStorage.getItem('users')) || [];
         const actualUser = actualUsers.find(u => u.id === currentUser.id);
         if (actualUser) {
             updateAuthUI(true);
         } else {
-            // Если пользователь не найден в списке, выходим из аккаунта
             logout();
         }
     } else {
@@ -109,15 +107,15 @@ document.getElementById('registrationForm').addEventListener('submit', function(
     
     // Создаем нового пользователя
     const newUser = {
-        id: Date.now(), // Добавляем уникальный ID
+        id: Date.now(),
         username,
         email,
         password,
-        registrationDate: new Date().toLocaleDateString() // Добавляем дату регистрации
+        registrationDate: new Date().toLocaleDateString()
     };
     
     users.push(newUser);
-    saveUsers(); // Сохраняем обновленный список пользователей
+    saveUsers();
     
     currentUser = newUser;
     localStorage.setItem('currentUser', JSON.stringify(newUser));
@@ -149,7 +147,7 @@ document.getElementById('uploadModForm').addEventListener('submit', function(e) 
         description: modDescription,
         fileName: modFile.name,
         uploadDate: new Date().toLocaleDateString(),
-        author: currentUser.username // Добавляем автора мода
+        author: currentUser.username
     };
 
     mods.push(newMod);
