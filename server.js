@@ -11,8 +11,8 @@ app.use(bodyParser.json());
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'your-email@gmail.com', // Замените на ваш email
-        pass: 'your-password' // Замените на ваш пароль приложения Gmail
+        user: 'ваш.email@gmail.com',        // Ваш Gmail адрес
+        pass: 'xxxxxxxxxxxxxx'              // Пароль приложения, который вы получили
     }
 });
 
@@ -30,7 +30,7 @@ app.post('/api/send-code', async (req, res) => {
     const code = generateCode();
     
     const mailOptions = {
-        from: 'your-email@gmail.com',
+        from: 'ваш.email@gmail.com',
         to: email,
         subject: 'Код подтверждения Fantasy World',
         text: `Ваш код подтверждения: ${code}`
