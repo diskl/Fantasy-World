@@ -117,7 +117,7 @@ async function verifyCode() {
 }
 
 // Обработчик формы входа
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
+document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
     const email = document.getElementById('loginEmail').value;
@@ -126,16 +126,11 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     const user = users.find(u => u.email === email && u.password === password);
     
     if (user) {
-        pendingUser = user;
-        isVerifying = false;
-        const sent = await sendVerificationCode(email);
-        
-        if (sent) {
-            document.getElementById('verificationForm').style.display = 'block';
-            alert('Код подтверждения отправлен на ваш email');
-        } else {
-            alert('Ошибка отправки кода подтверждения');
-        }
+        currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        updateAuthUI(true);
+        alert('Добро пожаловать, ' + user.username + '!');
+        window.location.hash = '#главная';
     } else {
         alert('Неверный email или пароль');
     }
@@ -155,8 +150,8 @@ document.getElementById('logoutLink').addEventListener('click', function(e) {
     logout();
 });
 
-// Обновляем обработчик регистрации
-document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+// Обработчик регистрации
+document.getElementById('registrationForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
     const username = document.getElementById('username').value;
@@ -174,7 +169,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         return;
     }
     
-    pendingUser = {
+    const newUser = {
         id: Date.now(),
         username,
         email,
@@ -182,15 +177,15 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         registrationDate: new Date().toLocaleDateString()
     };
     
-    isVerifying = true;
-    const sent = await sendVerificationCode(email);
+    users.push(newUser);
+    saveUsers();
     
-    if (sent) {
-        document.getElementById('verificationForm').style.display = 'block';
-        alert('Код подтверждения отправлен на ваш email');
-    } else {
-        alert('Ошибка отправки кода подтверждения');
-    }
+    currentUser = newUser;
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    
+    alert('Регистрация успешна! Добро пожаловать, ' + username);
+    updateAuthUI(true);
+    window.location.hash = '#главная';
 });
 
 // Обновляем обработчик формы загрузки мода
