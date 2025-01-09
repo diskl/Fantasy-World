@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy World</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#главная">Главная</a></li>
+                <li><a href="#о-нас">О нас</a></li>
+                <li><a href="#моды">Моды</a></li>
+                <li><a href="#регистрация">Регистрация</a></li>
+                <li><a href="#вход" id="loginLink">Вход</a></li>
+                <li><a href="#" id="logoutLink" style="display: none;">Выход</a></li>
+                        </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="главная">
+            <h1>Добро пожаловать на сайт <span class="site-name">Fantasy World</span></h1>
+            <p>Это главная страница вашего сайта.</p>
+        </section>
+
+        <section id="о-нас">
+            <h2>О нас</h2>
+            <p>Здесь вы можете рассказать о своей компании или о себе.</p>
+        </section>
+
+        <section id="моды">
+            <h2>Моды для Minecraft</h2>
+            
+            <div class="mods-container">
+                <!-- Форма для загрузки мода -->
+                <div class="upload-mod-form">
+                    <h3>Загрузить мод</h3>
+                    <form id="uploadModForm">
+                        <div class="form-group">
+                            <label for="modName">Название мода:</label>
+                            <input type="text" id="modName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="modVersion">Версия Minecraft:</label>
+                            <select id="modVersion" required>
+                                <optgroup label="Новые версии">
+                                    <option value="1.20.4">1.20.4</option>
+                                    <option value="1.20.2">1.20.2</option>
+                                    <option value="1.20.1">1.20.1</option>
+                                    <option value="1.20">1.20</option>
+                                </optgroup>
+                                <optgroup label="1.19.x">
+                                    <option value="1.19.4">1.19.4</option>
+                                    <option value="1.19.3">1.19.3</option>
+                                    <option value="1.19.2">1.19.2</option>
+                                    <option value="1.19.1">1.19.1</option>
+                                    <option value="1.19">1.19</option>
+                                </optgroup>
+                                <optgroup label="1.18.x">
+                                    <option value="1.18.2">1.18.2</option>
+                                    <option value="1.18.1">1.18.1</option>
+                                    <option value="1.18">1.18</option>
+                                </optgroup>
+                                <optgroup label="1.17.x">
+                                    <option value="1.17.1">1.17.1</option>
+                                    <option value="1.17">1.17</option>
+                                </optgroup>
+                                <optgroup label="1.16.x">
+                                    <option value="1.16.5">1.16.5</option>
+                                    <option value="1.16.4">1.16.4</option>
+                                    <option value="1.16.3">1.16.3</option>
+                                    <option value="1.16.2">1.16.2</option>
+                                    <option value="1.16.1">1.16.1</option>
+                                    <option value="1.16">1.16</option>
+                                </optgroup>
+                                <optgroup label="1.15.x">
+                                    <option value="1.15.2">1.15.2</option>
+                                    <option value="1.15.1">1.15.1</option>
+                                    <option value="1.15">1.15</option>
+                                </optgroup>
+                                <optgroup label="1.14.x">
+                                    <option value="1.14.4">1.14.4</option>
+                                    <option value="1.14.3">1.14.3</option>
+                                    <option value="1.14.2">1.14.2</option>
+                                    <option value="1.14.1">1.14.1</option>
+                                    <option value="1.14">1.14</option>
+                                </optgroup>
+                                <optgroup label="1.13.x">
+                                    <option value="1.13.2">1.13.2</option>
+                                    <option value="1.13.1">1.13.1</option>
+                                    <option value="1.13">1.13</option>
+                                </optgroup>
+                                <optgroup label="1.12.x">
+                                    <option value="1.12.2">1.12.2</option>
+                                    <option value="1.12.1">1.12.1</option>
+                                    <option value="1.12">1.12</option>
+                                </optgroup>
+                                <optgroup label="Старые версии">
+                                    <option value="1.11.2">1.11.2</option>
+                                    <option value="1.10.2">1.10.2</option>
+                                    <option value="1.9.4">1.9.4</option>
+                                    <option value="1.8.9">1.8.9</option>
+                                    <option value="1.7.10">1.7.10</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="modDescription">Описание:</label>
+                            <textarea id="modDescription" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="modFile">Файл мода:</label>
+                            <input type="file" id="modFile" accept=".jar,.zip" required>
+                        </div>
+                        <button type="submit" class="submit-btn">Загрузить мод</button>
+                    </form>
+                </div>
+
+                <!-- Список модов -->
+                <div class="mods-list">
+                    <h3>Доступные моды</h3>
+                    <div id="modsList">
+                        <!-- Моды будут добавляться сюда через JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="вход">
+            <h2>Вход в аккаунт</h2>
+            <form class="registration-form" id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" name="loginEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Пароль:</label>
+                    <input type="password" id="loginPassword" name="loginPassword" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">Войти</button>
+            </form>
+        </section>
+
+        <section id="регистрация">
+            <h2>Регистрация</h2>
+            <form class="registration-form" id="registrationForm">
+                <div class="form-group">
+                    <label for="username">Имя пользователя:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password">Подтвердите пароль:</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">Зарегистрироваться</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Fantasy World. Все права защищены.</p>
+    </footer>
+</body>
+</html> 
