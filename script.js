@@ -203,7 +203,7 @@ document.getElementById('registrationForm').addEventListener('submit', function(
 });
 
 // Обновляем обработчик формы загрузки мода
-document.getElementById('uploadModForm').addEventListener('submit', function(e) {
+document.getElementById('uploadModForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     if (!currentUser) {
@@ -238,34 +238,56 @@ document.getElementById('uploadModForm').addEventListener('submit', function(e) 
         downloads: 0
     };
 
-    mods.push(newMod);
-    saveMods();
-    displayMods();
-    e.target.reset();
-    alert('Мод успешно загружен!');
+    try {
+        const response = await fetch('/api/mods', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newMod)
+        });
+
+        if (response.ok) {
+            displayMods();
+            e.target.reset();
+            alert('Мод успешно загружен!');
+        } else {
+            alert('Ошибка при загрузке мода');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Ошибка при загрузке мода');
+    }
 });
 
 // Функция отображения модов
-function displayMods() {
-    const modsListElement = document.getElementById('modsList');
-    modsListElement.innerHTML = '';
+async function displayMods() {
+    try {
+        const response = await fetch('/api/mods');
+        const modsData = await response.json();
+        
+        const modsListElement = document.getElementById('modsList');
+        modsListElement.innerHTML = '';
 
-    mods.forEach(mod => {
-        const modElement = document.createElement('div');
-        modElement.className = 'mod-card';
-        modElement.innerHTML = `
-            <h4>${mod.name}</h4>
-            <div class="mod-info">
-                <p>Версия Minecraft: ${mod.version}</p>
-                <p>Описание: ${mod.description}</p>
-                <p>Автор: ${mod.author}</p>
-                <p>Дата загрузки: ${mod.uploadDate}</p>
-                <p>Скачиваний: ${mod.downloads}</p>
-            </div>
-            <button class="download-btn" onclick="downloadMod(${mod.id})">Скачать мод</button>
-        `;
-        modsListElement.appendChild(modElement);
-    });
+        modsData.forEach(mod => {
+            const modElement = document.createElement('div');
+            modElement.className = 'mod-card';
+            modElement.innerHTML = `
+                <h4>${mod.name}</h4>
+                <div class="mod-info">
+                    <p>Версия Minecraft: ${mod.version}</p>
+                    <p>Описание: ${mod.description}</p>
+                    <p>Автор: ${mod.author}</p>
+                    <p>Дата загрузки: ${mod.uploadDate}</p>
+                    <p>Скачиваний: ${mod.downloads}</p>
+                </div>
+                <button class="download-btn" onclick="downloadMod(${mod.id})">Скачать мод</button>
+            `;
+            modsListElement.appendChild(modElement);
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки модов:', error);
+    }
 }
 
 // Функция скачивания мода
