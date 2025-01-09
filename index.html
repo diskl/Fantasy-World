@@ -17,19 +17,20 @@
                 <li><a href="#регистрация">Регистрация</a></li>
                 <li><a href="#вход" id="loginLink">Вход</a></li>
                 <li><a href="#" id="logoutLink" style="display: none;">Выход</a></li>
-                        </ul>
+                <li><a href="#смена-пароля" id="changePasswordLink" style="display: none;">Сменить пароль</a></li>
+            </ul>
         </nav>
     </header>
 
     <main>
         <section id="главная">
             <h1>Добро пожаловать на сайт <span class="site-name">Fantasy World</span></h1>
-            <p>Это главная страница вашего сайта.</p>
+            <p>Ето главная страница сайта.</p>
         </section>
 
         <section id="о-нас">
-            <h2>О нас</h2>
-            <p>Здесь вы можете рассказать о своей компании или о себе.</p>
+            <h2>про сайт</h2>
+            <p>Ето сайт от автора Diskl для скачивания модов для Minecraft а в будущем будет и многое другое.</p>
         </section>
 
         <section id="моды">
@@ -171,6 +172,25 @@
                 </div>
                 
                 <button type="submit" class="submit-btn">Зарегистрироваться</button>
+            </form>
+        </section>
+
+        <section id="смена-пароля" style="display: none;">
+            <h2>Смена пароля</h2>
+            <form class="registration-form" id="changePasswordForm">
+                <div class="form-group">
+                    <label for="currentPassword">Текущий пароль:</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Новый пароль:</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmNewPassword">Подтвердите новый пароль:</label>
+                    <input type="password" id="confirmNewPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">Сменить пароль</button>
             </form>
         </section>
     </main>

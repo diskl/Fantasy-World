@@ -4,9 +4,17 @@ let currentUser = null;
 let pendingUser = null;
 let isVerifying = false;
 
+// Добавим массив для хранения модов
+let mods = JSON.parse(localStorage.getItem('mods')) || [];
+
 // Функция сохранения пользователей
 function saveUsers() {
     localStorage.setItem('users', JSON.stringify(users));
+}
+
+// Функция сохранения модов
+function saveMods() {
+    localStorage.setItem('mods', JSON.stringify(mods));
 }
 
 // Функция проверки авторизации
@@ -30,22 +38,28 @@ function checkAuth() {
 function updateAuthUI(isLoggedIn) {
     const loginLink = document.getElementById('loginLink');
     const logoutLink = document.getElementById('logoutLink');
+    const changePasswordLink = document.getElementById('changePasswordLink');
     const uploadForm = document.querySelector('.upload-mod-form');
     const loginSection = document.getElementById('вход');
     const registerSection = document.getElementById('регистрация');
+    const changePasswordSection = document.getElementById('смена-пароля');
 
     if (isLoggedIn) {
         loginLink.style.display = 'none';
         logoutLink.style.display = 'block';
+        changePasswordLink.style.display = 'block';
         uploadForm.style.display = 'block';
         loginSection.style.display = 'none';
         registerSection.style.display = 'none';
+        changePasswordSection.style.display = 'none';
     } else {
         loginLink.style.display = 'block';
         logoutLink.style.display = 'none';
+        changePasswordLink.style.display = 'none';
         uploadForm.style.display = 'none';
         loginSection.style.display = 'block';
         registerSection.style.display = 'block';
+        changePasswordSection.style.display = 'none';
     }
 }
 
@@ -203,6 +217,16 @@ document.getElementById('uploadModForm').addEventListener('submit', function(e) 
     const modDescription = document.getElementById('modDescription').value;
     const modFile = document.getElementById('modFile').files[0];
 
+    if (!modFile) {
+        alert('Выберите файл мода!');
+        return;
+    }
+
+    if (!modFile.name.endsWith('.jar')) {
+        alert('Можно загружать только .jar файлы!');
+        return;
+    }
+
     const newMod = {
         id: Date.now(),
         name: modName,
@@ -210,16 +234,18 @@ document.getElementById('uploadModForm').addEventListener('submit', function(e) 
         description: modDescription,
         fileName: modFile.name,
         uploadDate: new Date().toLocaleDateString(),
-        author: currentUser.username
+        author: currentUser.username,
+        downloads: 0
     };
 
     mods.push(newMod);
+    saveMods();
     displayMods();
     e.target.reset();
     alert('Мод успешно загружен!');
 });
 
-// Обновляем функцию отображения модов
+// Функция отображения модов
 function displayMods() {
     const modsListElement = document.getElementById('modsList');
     modsListElement.innerHTML = '';
@@ -234,6 +260,7 @@ function displayMods() {
                 <p>Описание: ${mod.description}</p>
                 <p>Автор: ${mod.author}</p>
                 <p>Дата загрузки: ${mod.uploadDate}</p>
+                <p>Скачиваний: ${mod.downloads}</p>
             </div>
             <button class="download-btn" onclick="downloadMod(${mod.id})">Скачать мод</button>
         `;
@@ -241,6 +268,79 @@ function displayMods() {
     });
 }
 
+// Функция скачивания мода
+function downloadMod(modId) {
+    const mod = mods.find(m => m.id === modId);
+    if (mod) {
+        mod.downloads++;
+        saveMods();
+        displayMods();
+        alert(`Начинается скачивание мода: ${mod.name}`);
+    }
+}
+
 // Инициализация при загрузке страницы
-checkAuth();
-displayMods(); 
+window.addEventListener('load', function() {
+    checkAuth();
+    displayMods();
+});
+
+// Добавим обработчик формы смены пароля
+document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!currentUser) {
+        alert('Необходимо войти в аккаунт');
+        return;
+    }
+    
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+    
+    // Проверяем текущий пароль
+    if (currentPassword !== currentUser.password) {
+        alert('Неверный текущий пароль');
+        return;
+    }
+    
+    // Проверяем совпадение новых паролей
+    if (newPassword !== confirmNewPassword) {
+        alert('Новые пароли не совпадают');
+        return;
+    }
+    
+    // Обновляем пароль пользователя
+    const userIndex = users.findIndex(u => u.id === currentUser.id);
+    if (userIndex !== -1) {
+        users[userIndex].password = newPassword;
+        currentUser.password = newPassword;
+        
+        // Сохраняем изменения
+        saveUsers();
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        alert('Пароль успешно изменен');
+        document.getElementById('changePasswordForm').reset();
+        window.location.hash = '#главная';
+    }
+});
+
+// Добавим обработчик клика по ссылке смены пароля
+document.getElementById('changePasswordLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    if (!currentUser) {
+        alert('Необходимо войти в аккаунт');
+        return;
+    }
+    
+    const changePasswordSection = document.getElementById('смена-пароля');
+    const sections = document.querySelectorAll('section');
+    
+    // Скрываем все секции
+    sections.forEach(section => section.style.display = 'none');
+    
+    // Показываем форму смены пароля
+    changePasswordSection.style.display = 'block';
+}); 
