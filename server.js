@@ -36,6 +36,20 @@ app.post('/api/mods', (req, res) => {
     res.json({ success: true, mod: newMod });
 });
 
+// API для удаления мода
+app.delete('/api/mods/:id', (req, res) => {
+    const modId = parseInt(req.params.id);
+    const index = mods.findIndex(mod => mod.id === modId);
+    
+    if (index !== -1) {
+        mods.splice(index, 1);
+        fs.writeFileSync(modsFile, JSON.stringify(mods));
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ error: 'Мод не найден' });
+    }
+});
+
 // Отправляем index.html для всех остальных маршрутов
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));

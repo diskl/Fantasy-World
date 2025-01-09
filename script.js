@@ -49,17 +49,26 @@ function updateAuthUI(isLoggedIn) {
         logoutLink.style.display = 'block';
         changePasswordLink.style.display = 'block';
         uploadForm.style.display = 'block';
-        loginSection.style.display = 'none';
-        registerSection.style.display = 'none';
-        changePasswordSection.style.display = 'none';
+
+        // Добавляем специальные элементы для администратора
+        if (isAdmin(currentUser)) {
+            document.querySelectorAll('.mod-card').forEach(card => {
+                if (!card.querySelector('.admin-controls')) {
+                    const adminControls = document.createElement('div');
+                    adminControls.className = 'admin-controls';
+                    adminControls.innerHTML = `
+                        <button class="admin-btn delete-btn">Удалить мод</button>
+                        <button class="admin-btn edit-btn">Редактировать</button>
+                    `;
+                    card.appendChild(adminControls);
+                }
+            });
+        }
     } else {
         loginLink.style.display = 'block';
         logoutLink.style.display = 'none';
         changePasswordLink.style.display = 'none';
         uploadForm.style.display = 'none';
-        loginSection.style.display = 'block';
-        registerSection.style.display = 'block';
-        changePasswordSection.style.display = 'none';
     }
 }
 
@@ -282,6 +291,12 @@ async function displayMods() {
                     <p>Скачиваний: ${mod.downloads}</p>
                 </div>
                 <button class="download-btn" onclick="downloadMod(${mod.id})">Скачать мод</button>
+                ${isAdmin(currentUser) ? `
+                    <div class="admin-controls">
+                        <button class="admin-btn delete-btn" onclick="deleteMod(${mod.id})">Удалить мод</button>
+                        <button class="admin-btn edit-btn" onclick="editMod(${mod.id})">Редактировать</button>
+                    </div>
+                ` : ''}
             `;
             modsListElement.appendChild(modElement);
         });
@@ -365,4 +380,33 @@ document.getElementById('changePasswordLink').addEventListener('click', function
     
     // Показываем форму смены пароля
     changePasswordSection.style.display = 'block';
-}); 
+});
+
+// Добавим проверку на администратора
+function isAdmin(user) {
+    return user && user.username === 'Maxim Diskl';
+}
+
+// Добавим функции администратора
+async function deleteMod(modId) {
+    if (!isAdmin(currentUser)) {
+        alert('Недостаточно прав для этого действия');
+        return;
+    }
+
+    if (confirm('Вы уверены, что хотите удалить этот мод?')) {
+        try {
+            const response = await fetch(`/api/mods/${modId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                displayMods();
+                alert('Мод успешно удален');
+            }
+        } catch (error) {
+            console.error('Ошибка при удалении мода:', error);
+            alert('Ошибка при удалении мода');
+        }
+    }
+} 

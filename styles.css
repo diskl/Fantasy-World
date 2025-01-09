@@ -277,4 +277,37 @@ select option {
 select {
     max-height: 300px;
     overflow-y: auto;
+}
+
+.admin-controls {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.admin-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.delete-btn {
+    background-color: #ff4444;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #cc0000;
+}
+
+.edit-btn {
+    background-color: #33b5e5;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #0099cc;
 } 
