@@ -1,13 +1,26 @@
-// Объект для хранения пользователей (в реальном проекте нужно использовать базу данных)
-let users = [];
+// Загружаем сохраненных пользователей при запуске
+let users = JSON.parse(localStorage.getItem('users')) || [];
 let currentUser = null;
+
+// Функция сохранения пользователей
+function saveUsers() {
+    localStorage.setItem('users', JSON.stringify(users));
+}
 
 // Функция проверки авторизации
 function checkAuth() {
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
-        updateAuthUI(true);
+        // Проверяем, существует ли пользователь в актуальном списке
+        const actualUsers = JSON.parse(localStorage.getItem('users')) || [];
+        const actualUser = actualUsers.find(u => u.id === currentUser.id);
+        if (actualUser) {
+            updateAuthUI(true);
+        } else {
+            // Если пользователь не найден в списке, выходим из аккаунта
+            logout();
+        }
     } else {
         updateAuthUI(false);
     }
@@ -43,8 +56,11 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
+    // Загружаем актуальный список пользователей
+    const currentUsers = JSON.parse(localStorage.getItem('users')) || [];
+    
     // Поиск пользователя
-    const user = users.find(u => u.email === email && u.password === password);
+    const user = currentUsers.find(u => u.email === email && u.password === password);
     
     if (user) {
         currentUser = user;
@@ -57,13 +73,18 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     }
 });
 
-// Обработчик выхода
-document.getElementById('logoutLink').addEventListener('click', function(e) {
-    e.preventDefault();
+// Добавляем функцию выхода
+function logout() {
     currentUser = null;
     localStorage.removeItem('currentUser');
     updateAuthUI(false);
     window.location.hash = '#главная';
+}
+
+// Обновляем обработчик выхода
+document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    logout();
 });
 
 // Обновляем обработчик регистрации
@@ -88,12 +109,16 @@ document.getElementById('registrationForm').addEventListener('submit', function(
     
     // Создаем нового пользователя
     const newUser = {
+        id: Date.now(), // Добавляем уникальный ID
         username,
         email,
-        password
+        password,
+        registrationDate: new Date().toLocaleDateString() // Добавляем дату регистрации
     };
     
     users.push(newUser);
+    saveUsers(); // Сохраняем обновленный список пользователей
+    
     currentUser = newUser;
     localStorage.setItem('currentUser', JSON.stringify(newUser));
     
