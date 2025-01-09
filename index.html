@@ -17,7 +17,7 @@
                 <li><a href="#регистрация">Регистрация</a></li>
                 <li><a href="#вход" id="loginLink">Вход</a></li>
                 <li><a href="#" id="logoutLink" style="display: none;">Выход</a></li>
-            </ul>
+                        </ul>
         </nav>
     </header>
 
@@ -119,10 +119,19 @@
                 <button type="submit" class="submit-btn">Зарегистрироваться</button>
             </form>
         </section>
+
+        <div id="verificationForm" class="registration-form" style="display: none;">
+            <h3>Подтверждение email</h3>
+            <div class="form-group">
+                <label for="verificationCode">Введите код из email:</label>
+                <input type="text" id="verificationCode" required>
+            </div>
+            <button type="button" class="submit-btn" onclick="verifyCode()">Подтвердить</button>
+        </div>
     </main>
 
     <footer>
-        <p>&copy; 2024 Fantasy World. Все права защищены.</p>
+        <p>&copy; 2025 Fantasy World. Все права защищены.</p>
     </footer>
 </body>
 </html> 

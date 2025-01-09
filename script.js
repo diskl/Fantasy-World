@@ -1,6 +1,8 @@
 // Загружаем сохраненных пользователей при запуске
 let users = JSON.parse(localStorage.getItem('users')) || [];
 let currentUser = null;
+let pendingUser = null;
+let isVerifying = false;
 
 // Функция сохранения пользователей
 function saveUsers() {
@@ -47,25 +49,93 @@ function updateAuthUI(isLoggedIn) {
     }
 }
 
+// Функция отправки кода подтверждения
+async function sendVerificationCode(email) {
+    try {
+        const response = await fetch('/api/send-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Ошибка отправки кода');
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Ошибка:', error);
+        return false;
+    }
+}
+
+// Функция проверки кода
+async function verifyCode() {
+    const code = document.getElementById('verificationCode').value;
+    
+    try {
+        const response = await fetch('/api/verify-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: pendingUser.email,
+                code: code
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (isVerifying) {
+                // Завершаем регистрацию
+                users.push(pendingUser);
+                saveUsers();
+                currentUser = pendingUser;
+                localStorage.setItem('currentUser', JSON.stringify(pendingUser));
+                alert('Регистрация успешна! Добро пожаловать, ' + pendingUser.username);
+            } else {
+                // Завершаем вход
+                currentUser = pendingUser;
+                localStorage.setItem('currentUser', JSON.stringify(pendingUser));
+                alert('Вход выполнен успешно! Добро пожаловать, ' + pendingUser.username);
+            }
+            
+            document.getElementById('verificationForm').style.display = 'none';
+            updateAuthUI(true);
+            window.location.hash = '#главная';
+        } else {
+            alert('Неверный код подтверждения');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Ошибка проверки кода');
+    }
+}
+
 // Обработчик формы входа
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
-    // Загружаем актуальный список пользователей
-    const currentUsers = JSON.parse(localStorage.getItem('users')) || [];
-    
-    // Поиск пользователя
-    const user = currentUsers.find(u => u.email === email && u.password === password);
+    const user = users.find(u => u.email === email && u.password === password);
     
     if (user) {
-        currentUser = user;
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        updateAuthUI(true);
-        alert('Добро пожаловать, ' + user.username + '!');
-        window.location.hash = '#главная';
+        pendingUser = user;
+        isVerifying = false;
+        const sent = await sendVerificationCode(email);
+        
+        if (sent) {
+            document.getElementById('verificationForm').style.display = 'block';
+            alert('Код подтверждения отправлен на ваш email');
+        } else {
+            alert('Ошибка отправки кода подтверждения');
+        }
     } else {
         alert('Неверный email или пароль');
     }
@@ -86,7 +156,7 @@ document.getElementById('logoutLink').addEventListener('click', function(e) {
 });
 
 // Обновляем обработчик регистрации
-document.getElementById('registrationForm').addEventListener('submit', function(e) {
+document.getElementById('registrationForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const username = document.getElementById('username').value;
@@ -99,14 +169,12 @@ document.getElementById('registrationForm').addEventListener('submit', function(
         return;
     }
     
-    // Проверяем, не существует ли уже такой email
     if (users.some(u => u.email === email)) {
         alert('Пользователь с таким email уже существует!');
         return;
     }
     
-    // Создаем нового пользователя
-    const newUser = {
+    pendingUser = {
         id: Date.now(),
         username,
         email,
@@ -114,15 +182,15 @@ document.getElementById('registrationForm').addEventListener('submit', function(
         registrationDate: new Date().toLocaleDateString()
     };
     
-    users.push(newUser);
-    saveUsers();
+    isVerifying = true;
+    const sent = await sendVerificationCode(email);
     
-    currentUser = newUser;
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-    
-    alert('Регистрация успешна! Добро пожаловать, ' + username);
-    updateAuthUI(true);
-    window.location.hash = '#главная';
+    if (sent) {
+        document.getElementById('verificationForm').style.display = 'block';
+        alert('Код подтверждения отправлен на ваш email');
+    } else {
+        alert('Ошибка отправки кода подтверждения');
+    }
 });
 
 // Обновляем обработчик формы загрузки мода
